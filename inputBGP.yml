@@ -1,0 +1,4 @@
+---
+AS : 100
+neighbor : 192.168.10.100
+neighbor_as : 200
