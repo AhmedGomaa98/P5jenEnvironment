@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git 'https://github.com/yourusername/your-repo.git'
+            }
+        }
+
+        stage('Set Up Environment') {
+            steps {
+                // Set up Python environment, e.g., using virtualenv
+                sh '''
+                python3 -m venv venv
+                source venv/bin/activate
+                pip install -r requirements.txt
+                '''
+            }
+        }
+
+        stage('User Input') {
+            steps {
+                script {
+                    // Prompt user for input
+                    def userInput = input(
+                        id: 'userInput', message: 'Select an option', parameters: [
+                        choice(name: 'OPTION', choices: '1\n2\n3', description: 'Choose an option for the script')
+                    ])
+                    env.USER_OPTION = userInput
+                }
+            }
+        }
+
+        stage('Run Network Script') {
+            steps {
+                // Run your network-related Python script with the user input
+                sh '''
+                source venv/bin/activate
+                python your_network_script.py ${USER_OPTION}
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            // Optionally, clean up environment
+            sh 'deactivate'
+        }
+    }
+}
